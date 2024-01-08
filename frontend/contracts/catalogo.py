@@ -15,7 +15,7 @@ class CategoriaEnum(str, Enum):
 
 
 class Catalogo(BaseModel):
-    EAN: str
+    EAN: int
     Produto : str
     Categoria: CategoriaEnum
     Descricao: str

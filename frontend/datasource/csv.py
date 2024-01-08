@@ -1,10 +1,11 @@
 import streamlit as st
 import openpyxl
 import pandas as pd
+from pydantic import ValidationError
 
 class CSVCollector:
     def __init__(self, schema, aws, cell_range):
-        self.schema = schema
+        self._schema = schema
         self._aws = aws
         self._buffer = None
         self.cell_range = cell_range
@@ -12,9 +13,12 @@ class CSVCollector:
     
     def start(self):
         getData = self.getData()
+        extractData = None
         if getData is not None:
             extractData = self.extractData(getData)
-            return extractData
+        if extractData is not None:
+            validateDate = self.validateDate(extractData)
+            return validateDate
 
     def getData(self):
         dados_excel = st.file_uploader("Insire o arquivo Excel", type=".xlsx")
@@ -33,8 +37,21 @@ class CSVCollector:
         dataframe = pd.DataFrame(data, columns=headers)
         return dataframe
     
-    def validateDate(self):
-        pass
+    def validateDate(self, dataframe):
+        error = []
+        valid_rows = []
+        for index, row in dataframe.iterrows():
+            try:
+                valid_row = self._schema(**row.to_dict())
+                valid_rows.append(valid_row)
+            except ValidationError as e:
+                error.append(f"Erro na linha {index+1}: {e}")
+        if error:
+            st.error("\n".join(error))
+            return None
+        st.success("Tudo certo!")
+        return dataframe
+    
 
     def loadData(self):
         pass 

@@ -10,5 +10,5 @@ st.title("Essa é uma página de portal de dados")
 #    st.write("Why hello there")
 
 aws_instancia = S3Client()
-catalogo_de_produto = CSVCollector(Catalogo, aws_instancia, "C12:I209")
+catalogo_de_produto = CSVCollector(Catalogo, aws_instancia, "C11:I211")
 catalogo_de_produto.start()
